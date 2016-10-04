@@ -1,0 +1,22 @@
+$LOAD_PATH.unshift "#{File.dirname(__FILE__)}/../lib"
+
+require 'logic'
+require 'paths'
+
+include Logic
+include Paths::Logic
+
+
+def script_body
+  FileUtils.rm_rf Dir.glob("#{OUTPUT_PATH}//*")
+
+  image_a = Magick::Image::read(PATHS[:image_a])[0]
+  image_b = Magick::Image::read(PATHS[:image_b])[0]
+
+  logic_not(image_a).write PATHS[:not_a]
+  logic_not(image_b).write PATHS[:not_b]
+  logic_and(image_a, image_b).write PATHS[:and]
+  logic_or(image_a, image_b).write PATHS[:or]
+end
+
+script_body

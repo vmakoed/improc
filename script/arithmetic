@@ -1,0 +1,19 @@
+$LOAD_PATH.unshift "#{File.dirname(__FILE__)}/../lib"
+
+require 'arithmetic'
+require 'paths'
+
+include Arithmetic
+include Paths::Arithmetic
+
+def script_body
+  FileUtils.rm_rf Dir.glob("#{OUTPUT_PATH}//*")
+
+  image_a = Magick::Image::read(PATHS[:image_a])[0]
+  image_b = Magick::Image::read(PATHS[:image_b])[0]
+
+  add(image_a, image_b).write PATHS[:addition]
+  subtract(image_a, image_b).write PATHS[:subtraction]
+end
+
+script_body

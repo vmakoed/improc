@@ -1,0 +1,29 @@
+$LOAD_PATH.unshift "#{File.dirname(__FILE__)}/../lib"
+
+require 'arithmetic_constant'
+require 'paths'
+
+include ArithmeticConstant
+include Paths::ArithmeticConstant
+
+ADDITION = { red: 30000, green: 30000, blue: 30000 }.freeze
+MULTIPLICATION = { red: 1.618, green: 0, blue: 0 }.freeze
+
+PIXEL_FOR_ADDITION = Magick::Pixel.new ADDITION[:red],
+                                       ADDITION[:green],
+                                       ADDITION[:blue]
+
+PIXEL_FOR_MULTIPLICATION = Magick::Pixel.new MULTIPLICATION[:red],
+                                             MULTIPLICATION[:green],
+                                             MULTIPLICATION[:blue]
+
+def script_body
+  FileUtils.rm_rf Dir.glob("#{OUTPUT_PATH}//*")
+
+  image = Magick::Image::read(PATHS[:image])[0]
+
+  add(image, PIXEL_FOR_ADDITION).write PATHS[:addition]
+  multiply(image, PIXEL_FOR_MULTIPLICATION).write PATHS[:multiplication]
+end
+
+script_body
