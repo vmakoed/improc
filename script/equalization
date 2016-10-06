@@ -1,0 +1,16 @@
+$LOAD_PATH.unshift "#{File.dirname(__FILE__)}/../lib"
+
+require 'equalization'
+require 'paths'
+
+include Equalization
+include Paths::Equalization
+
+def script_body
+  FileUtils.rm_rf Dir.glob("#{OUTPUT_PATH}//*")
+
+  image = Magick::Image::read(PATHS[:image])[0]
+  equalize(image).write PATHS[:equalized]
+end
+
+script_body

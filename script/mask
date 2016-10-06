@@ -17,7 +17,8 @@ def script_body
   FileUtils.rm_rf Dir.glob("#{OUTPUT_PATH}//*")
 
   image = Magick::Image::read(PATHS[:image])[0]
-  mask(image, MASK_PIXEL, MASK_X, MASK_Y, MASK_WIDTH, MASK_HEIGHT).write PATHS[:masked]
+  mask(image, Magick::Image::read(PATHS[:mask])[0], MASK_X, MASK_Y, MASK_WIDTH, MASK_HEIGHT).write PATHS[:masked_image]
+  mask(image, MASK_PIXEL, MASK_X, MASK_Y, MASK_WIDTH, MASK_HEIGHT).write PATHS[:masked_pixel]
 end
 
 script_body

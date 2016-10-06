@@ -1,19 +1,30 @@
 require 'rmagick'
 require_relative 'common'
+require_relative 'logic'
 
 module Mask
   include Common
+  include Logic
 
-  def mask(image, mask_pixel, mask_x, mask_y, mask_width, mask_height)
-    result = Magick::Image.new image.columns, image.rows
+  def mask(image, mask, mask_x, mask_y, mask_width, mask_height)
+    applied_mask = fetch_mask(image, mask, mask_x, mask_y, mask_width, mask_height)
+    logic_and image, applied_mask
+  end
 
-    image.each_pixel do |pixel, column, row|
-      masked = masked? column, row, mask_x, mask_y, mask_width, mask_height
-      stored_pixel = masked ? mask_pixel : pixel
-      result.store_pixels column, row, 1, 1, [stored_pixel]
-    end
+  def fetch_mask(image, mask, mask_x, mask_y, mask_width, mask_height)
+    return mask if mask.is_a? Magick::Image
+    mask_from_pixel(image, mask, mask_x, mask_y, mask_width, mask_height)
+  end
 
-    result
+  def mask_from_pixel(image, pixel, mask_x, mask_y, mask_width, mask_height)
+    mask = Magick::Image.new(image.columns, image.rows) { self.background_color = 'white' }
+    painter = Magick::Draw.new
+    painter.stroke_opacity 0
+    painter.stroke_width 0
+    painter.fill "rgb(#{pixel.red}, #{pixel.green}, #{pixel.blue})"
+    painter.rectangle(mask_x, mask_y, mask_x + mask_width, mask_y + mask_height)
+    painter.draw mask
+    mask
   end
 
   def masked?(column, row, mask_x, mask_y, mask_width, mask_height)
